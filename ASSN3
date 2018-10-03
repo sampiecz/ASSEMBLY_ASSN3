@@ -3,7 +3,7 @@
 //STEPLIB DD DSN=KC02293.ASSIST.LOADLIB,DISP=SHR                        00030000
 //SYSPRINT DD SYSOUT=*                                                  00040000
 //SYSIN DD *                                                            00050000
-***************************************************                     00060000
+*********************************************************************   00060045
 *                                                                       00070000
 * Program:     ASSIGN 3                                                 00080003
 * Programmer:  Sam Piecz                                                00090003
@@ -18,114 +18,122 @@
 * 7 Holds the value for the discount                                    00180042
 * 8 Multiplication                                                      00190042
 * 9  Holds the number of orders                                         00200042
-* 10                                                                    00210003
-* 11                                                                    00220003
-* 12                                                                    00230003
-* 13                                                                    00240003
-* 14                                                                    00250003
-* 15                                                                    00260003
-* 16                                                                    00270003
-***************************************************                     00280000
+* 10  Holds the shipping cost either 0 or 600                           00210045
+* 11  Sum of pretotal and shipping. At least at first.                  00220045
+* 12  Used as intermedia register to store order total                  00230045
+* 13  Counter for how many sales we have.                               00240045
+* 14  Reserved for end of program BR 14                                 00250045
+* 15  Nope                                                              00260045
+* 16  Nope                                                              00270045
+*********************************************************************   00280045
 MAIN     CSECT                                                          00290000
          USING MAIN,15                                                  00300000
-         XPRNT HEADER,133                                               00310010
-         XPRNT PLINE1,133                                               00320010
-         SR    13,13                                                    00321031
-         SR    6,6                                                      00322033
-         SR    12,12                                                    00323037
-LOOP     XREAD BUFFER,80                                                00330000
-         BC    B'0100',ENDLOOP                                          00340000
-         A     13,=F'1'          Increment / init counter               00350025
-         XDECI 2,BUFFER          Read first val from file               00360025
-         XDECI 3,0(1)            Read secnd val from file               00370025
-         XDECI 4,0(1)            Read third val from file               00380025
-         XDECI 5,0(1)            Read fourth val from file              00390025
-         XDECO 2,PRODID          Store register 2 in label              00400025
-         XDECO 3,ORDRID          Store register 3 in label              00410025
-         XDECO 4,PRCEAC          Store register 4 in label              00420025
-         XDECO 5,NUMORD          Store register 5 in label              00430025
-         SR    8,8               Cleared out                            00450025
-         SR    9,9               Cleared out                            00460025
-         LR    9,5               Load numord into R9                    00470025
-         MR    8,4               Multiply prceach and numord            00480025
-         C     9,=F'15000'       Compare register 9 and 15000           00490025
-         BC    B'1010',GTOET     Branch if to label GTOET               00490125
-         L     7,=F'0'           If not gtoet load 0 into 7             00490325
-         BC    B'1111',ONWARDS   Go to onwards                          00490425
-GTOET    L     7,=F'500'         If R9 is gtoet l 500 into 7            00490525
-ONWARDS  XDECO 7,DISCNT                                                 00490625
-         C     9,=F'5000'                                               00490725
-         BC    B'1010',ANOTHA                                           00490825
-         L     10,=F'600'                                               00490925
-         BC    B'1111',PLSSTOP                                          00491025
-ANOTHA   L     10,=F'0'                                                 00491125
-         A     6,=F'1'                                                  00491233
-PLSSTOP  XDECO 10,SHPPNG                                                00491325
-         LR    11,9                                                     00491425
-         AR    11,10                                                    00491525
-         SR    11,7                                                     00491625
-         AR    12,11                                                    00491740
-         XDECO 11,TOTAL                                                 00491825
-         XDECO 13,COUNTR                                                00491930
-         XDECO 6,FSCOUNT                                                00492034
-         XDECO 12,SUMSVAR                                               00493039
-         XPRNT USEME,133                                                00500025
-         BC    B'1111',LOOP                                             00510000
-ENDLOOP  XPRNT TOTSAL,37                                                00520033
-         XPRNT NUMFS,39                                                 00520135
-         XPRNT SUMSALE,30                                               00520237
-         BR    14                                                       00521028
-         LTORG                                                          00530000
-HEADER   DC    C' '                                                     00540009
-         DC    CL43' '                                                  00550009
-         DC    CL28'Sales Report -- Widgets-R-Us'                       00560009
-         DC    CL61' '                                                  00570009
-PLINE1   DC    C' '                                                     00580010
-         DC    CL5' '                                                   00590010
-         DC    CL8'ORDER ID'                                            00600010
-         DC    CL8' '                                                   00610010
-         DC    CL10'PRODUCT ID'                                         00620010
-         DC    CL7' '                                                   00630010
-         DC    CL10'PRICE EACH'                                         00640010
-         DC    CL5' '                                                   00650010
-         DC    CL14'NUMBER ORDERED'                                     00660010
-         DC    CL6' '                                                   00670010
-         DC    CL8'DISCOUNT'                                            00680010
-         DC    CL9' '                                                   00690010
-         DC    CL8'SHIPPING'                                            00700010
-         DC    CL10' '                                                  00710010
-         DC    CL5'TOTAL'                                               00720010
-         DC    CL19' '                                                  00730010
-USEME    DC    C' '                                                     00740012
-ORDRID   DS    CL12                                                     00750021
-         DC    CL5' '                                                   00760013
-PRODID   DS    CL12                                                     00770021
-         DC    CL5' '                                                   00780013
-PRCEAC   DS    CL12                                                     00790021
-         DC    CL5' '                                                   00800013
-NUMORD   DS    CL12                                                     00810021
-         DC    CL5' '                                                   00811026
-DISCNT   DS    CL12                                                     00820021
-         DC    CL5' '                                                   00821027
-SHPPNG   DS    CL12                                                     00830021
-         DC    CL5' '                                                   00831027
-TOTAL    DS    CL12                                                     00840021
-         DC    CL19' '                                                  00850027
-TOTSAL   DC    C' '                                                     00860033
-         DC    CL22'TOTAL NUMBER OF SALES:'                             00870032
-         DC    CL2' '                                                   00871032
-COUNTR   DS    CL12                                                     00880022
-NUMFS    DC    C' '                                                     00881033
-         DC    CL26'NUMBER WITH FREE SHIPPING:'                         00882033
-FSCOUNT  DS    CL12                                                     00883036
-SUMSALE  DC    C' '                                                     00884037
-         DC    CL17'SUM OF ALL SALES:'                                  00885037
-SUMSVAR  DS    CL12                                                     00886037
-AVGSALE  DC    C' '                                                     00887041
-         DC    CL19'AVERAGE SALE TOTAL:'                                00888041
-AVGVAL   CL12                                                           00889041
-BUFFER   DS    80C                                                      00890000
-         END   MAIN                                                     00900000
-/*                                                                      00910000
-//FT05F001 DD DSN=KC02314.AUTUMN18.CSCI360.HW3DATA,DISP=SHR             00920000
-//                                                                      00930000
+         XPRNT HEADER,133        Print out the Sales header             00310045
+         XPRNT PLINE1,133        Print out the column headers           00320045
+         SR    13,13             Clear out register                     00330045
+         SR    6,6               Clear out register                     00340045
+         SR    12,12             Clear out register                     00350045
+LOOP     XREAD BUFFER,80         Read 80 bytes into Buffer              00360045
+         BC    B'0100',ENDLOOP   Keep going until XREAD hits end        00370045
+         A     13,=F'1'          Increment / init counter               00380025
+         XDECI 2,BUFFER          Read first val from file               00390025
+         XDECI 3,0(1)            Read secnd val from file               00400025
+         XDECI 4,0(1)            Read third val from file               00410025
+         XDECI 5,0(1)            Read fourth val from file              00420025
+         XDECO 2,PRODID          Store R2 in label                      00430045
+         XDECO 3,ORDRID          Store R3 in label                      00440045
+         XDECO 4,PRCEAC          Store R4 in label                      00450045
+         XDECO 5,NUMORD          Store R5 in label                      00460045
+         SR    8,8               Cleared out                            00470025
+         SR    9,9               Cleared out                            00480025
+         LR    9,5               Load numord into R9                    00490025
+         MR    8,4               Multiply prceach and numord            00500025
+         C     9,=F'15000'       Cmpre multp of prceac & numord         00510045
+         BC    B'1010',GTOET     Goto GTOET if R9 is >= 15000           00520045
+         L     7,=F'0'           If R9 ! >= 15000 L 0 into R7           00530045
+         BC    B'1111',ONWARDS   Go to onwards                          00540025
+GTOET    L     7,=F'500'         If R9 is >= 1500 L 500 in R7           00550045
+ONWARDS  XDECO 7,DISCNT          Either way, put discnt val in R7       00560045
+         C     9,=F'5000'        Compare R9 (pretotal) with 5000        00570045
+         BC    B'1010',ANOTHA    If R9 >= 5000 goto Anotha              00580045
+         L     10,=F'600'        If R9 ! >= 5000 load 600 into R10      00590045
+         BC    B'1111',PLSSTOP   Goto PLSTOP sry for bad label          00600045
+ANOTHA   L     10,=F'0'          If R9 >= 5000 load 0 into R10          00610045
+         A     6,=F'1'           ++ R6 aka freeship countr              00620045
+PLSSTOP  XDECO 10,SHPPNG         Always L R10 into var SHPPNG           00630045
+         LR    11,9              Load pretotal into R11                 00640045
+         AR    11,10             Add pretotal and shipping              00650045
+         SR    11,7              (pretotal+shipping)-discount           00660045
+         AR    12,11             Add 0 to R11 to store 11 in 12         00670045
+         XDECO 11,TOTAL          Put R11 in total                       00680045
+         XDECO 13,COUNTR         Put R13 into COUNTR                    00690045
+         XDECO 6,FSCOUNT         Put R6 in free shippng counter         00700045
+         XDECO 12,SUMSVAR        Put R12 in sum of all sales            00710045
+         XPRNT USEME,133         Print out rows of actual data          00720045
+         XDECO 3,AVGVAL                                                 00724045
+         BC    B'1111',LOOP      Non conditional goto topofloop         00730045
+ENDLOOP  XPRNT TOTSAL,37         End of loop print total sales          00740045
+         XPRNT NUMFS,39          Print num of free shppng ordrs         00750045
+         XPRNT SUMSALE,30        Print sum of all the sales             00760045
+         SR    2,2                                                      00761046
+         L     2,=F'00000000'                                           00761148
+         LR    2,11                                                     00762046
+         SR    3,3                                                      00763046
+         DR    2,13                                                     00764046
+         XDECO 3,AVGVAL                                                 00765046
+         XPRNT AVGSALE,32        Print the avg of all the sales         00770045
+         BR    14                End the program o yeah                 00780045
+         LTORG                   Define those variables whaddup         00790045
+HEADER   DC    C' '                                                     00800009
+         DC    CL43' '                                                  00810009
+         DC    CL28'Sales Report -- Widgets-R-Us'                       00820009
+         DC    CL61' '                                                  00830009
+PLINE1   DC    C' '                                                     00840010
+         DC    CL5' '                                                   00850010
+         DC    CL8'ORDER ID'                                            00860010
+         DC    CL8' '                                                   00870010
+         DC    CL10'PRODUCT ID'                                         00880010
+         DC    CL7' '                                                   00890010
+         DC    CL10'PRICE EACH'                                         00900010
+         DC    CL5' '                                                   00910010
+         DC    CL14'NUMBER ORDERED'                                     00920010
+         DC    CL6' '                                                   00930010
+         DC    CL8'DISCOUNT'                                            00940010
+         DC    CL9' '                                                   00950010
+         DC    CL8'SHIPPING'                                            00960010
+         DC    CL10' '                                                  00970010
+         DC    CL5'TOTAL'                                               00980010
+         DC    CL19' '                                                  00990010
+USEME    DC    C' '                                                     01000012
+ORDRID   DS    CL12                                                     01010021
+         DC    CL5' '                                                   01020013
+PRODID   DS    CL12                                                     01030021
+         DC    CL5' '                                                   01040013
+PRCEAC   DS    CL12                                                     01050021
+         DC    CL5' '                                                   01060013
+NUMORD   DS    CL12                                                     01070021
+         DC    CL5' '                                                   01080026
+DISCNT   DS    CL12                                                     01090021
+         DC    CL5' '                                                   01100027
+SHPPNG   DS    CL12                                                     01110021
+         DC    CL5' '                                                   01120027
+TOTAL    DS    CL12                                                     01130021
+         DC    CL19' '                                                  01140027
+TOTSAL   DC    C' '                                                     01150033
+         DC    CL22'TOTAL NUMBER OF SALES:'                             01160032
+         DC    CL2' '                                                   01170032
+COUNTR   DS    CL12                                                     01180022
+NUMFS    DC    C' '                                                     01190033
+         DC    CL26'NUMBER WITH FREE SHIPPING:'                         01200033
+FSCOUNT  DS    CL12                                                     01210036
+SUMSALE  DC    C' '                                                     01220037
+         DC    CL17'SUM OF ALL SALES:'                                  01230037
+SUMSVAR  DS    CL12                                                     01240037
+AVGSALE  DC    C' '                                                     01250041
+         DC    CL19'AVERAGE SALE TOTAL:'                                01260041
+AVGVAL   DS    CL12                                                     01270043
+BUFFER   DS    80C                                                      01280000
+         END   MAIN                                                     01290000
+/*                                                                      01300000
+//FT05F001 DD DSN=KC02314.AUTUMN18.CSCI360.HW3DATA,DISP=SHR             01310000
+//                                                                      01320000
