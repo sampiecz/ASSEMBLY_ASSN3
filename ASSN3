@@ -79,7 +79,7 @@ ENDLOOP  XPRNT TOTSAL,37         End of loop print total sales          00740045
          SR    3,3                                                      00761149
          L     2,=F'00000000'                                           00761248
          LR    3,11                                                     00762049
-         DR    2,13                                                     00764046
+         DR    2,12                                                     00764052
          XDECO 3,AVGVAL                                                 00765046
          XPRNT AVGSALE,32        Print the avg of all the sales         00770045
          BR    14                End the program o yeah                 00780045
