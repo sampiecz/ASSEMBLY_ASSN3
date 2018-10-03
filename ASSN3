@@ -72,16 +72,16 @@ PLSSTOP  XDECO 10,SHPPNG         Always L R10 into var SHPPNG           00630045
          XPRNT USEME,133         Print out rows of actual data          00720045
          XDECO 3,AVGVAL                                                 00724045
          BC    B'1111',LOOP      Non conditional goto topofloop         00730045
-ENDLOOP  XPRNT TOTSAL,37         End of loop print total sales          00740045
+ENDLOOP  XPRNT TOTSAL,39         End of loop print total sales          00740058
          XPRNT NUMFS,39          Print num of free shppng ordrs         00750045
-         XPRNT SUMSALE,30        Print sum of all the sales             00760045
-         SR    2,2                                                      00761046
-         SR    3,3                                                      00761149
-         L     2,=F'00000000'                                           00761248
-         LR    3,11                                                     00762049
-         DR    2,12                                                     00764052
-         XDECO 3,AVGVAL                                                 00765046
-         XPRNT AVGSALE,32        Print the avg of all the sales         00770045
+         XPRNT SUMSALE,39        Print sum of all the sales             00760057
+         SR    2,2               Clear R2  for division                 00761059
+         SR    3,3               Clear R3 for division                  00761159
+         L     2,=F'00000000'    Load R2 with all 0's tobe sure         00761259
+         LR    3,12              Load 12 into 3                         00762059
+         DR    2,13              Divide R3 by R13                       00764059
+         XDECO 3,AVGVAL          Put R3 in AVGVAL for print             00765059
+         XPRNT AVGSALE,39        Print the avg of all the sales         00770057
          BR    14                End the program o yeah                 00780045
          LTORG                   Define those variables whaddup         00790045
 HEADER   DC    C' '                                                     00800009
@@ -118,19 +118,21 @@ DISCNT   DS    CL12                                                     01090021
 SHPPNG   DS    CL12                                                     01110021
          DC    CL5' '                                                   01120027
 TOTAL    DS    CL12                                                     01130021
-         DC    CL19' '                                                  01140027
+         DC    CL21' '                                                  01140055
 TOTSAL   DC    C' '                                                     01150033
          DC    CL22'TOTAL NUMBER OF SALES:'                             01160032
-         DC    CL2' '                                                   01170032
+         DC    CL4' '                                                   01170058
 COUNTR   DS    CL12                                                     01180022
 NUMFS    DC    C' '                                                     01190033
          DC    CL26'NUMBER WITH FREE SHIPPING:'                         01200033
 FSCOUNT  DS    CL12                                                     01210036
 SUMSALE  DC    C' '                                                     01220037
          DC    CL17'SUM OF ALL SALES:'                                  01230037
+         DC    CL9' '                                                   01231057
 SUMSVAR  DS    CL12                                                     01240037
 AVGSALE  DC    C' '                                                     01250041
          DC    CL19'AVERAGE SALE TOTAL:'                                01260041
+         DC    CL7' '                                                   01261057
 AVGVAL   DS    CL12                                                     01270043
 BUFFER   DS    80C                                                      01280000
          END   MAIN                                                     01290000
