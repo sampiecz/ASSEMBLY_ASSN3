@@ -76,9 +76,9 @@ ENDLOOP  XPRNT TOTSAL,37         End of loop print total sales          00740045
          XPRNT NUMFS,39          Print num of free shppng ordrs         00750045
          XPRNT SUMSALE,30        Print sum of all the sales             00760045
          SR    2,2                                                      00761046
-         L     2,=F'00000000'                                           00761148
-         LR    2,11                                                     00762046
-         SR    3,3                                                      00763046
+         SR    3,3                                                      00761149
+         L     2,=F'00000000'                                           00761248
+         LR    3,11                                                     00762049
          DR    2,13                                                     00764046
          XDECO 3,AVGVAL                                                 00765046
          XPRNT AVGSALE,32        Print the avg of all the sales         00770045
